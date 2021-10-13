@@ -1,9 +1,10 @@
+// json 데이터
 var plays = {
 	"hamlet": {"name": "Hamlet", "type": "tragedy"},
 	"as-Like": {"name": "As You Like It", "type": "comedy"},
 	"othello": {"name": "Othello", "type": "tragedy"}
 };
-
+// json 데이터
 var invoices = {
 	"customer": "BigCo",
 	"performances": [
@@ -77,4 +78,5 @@ function statement(invoice, plays) {
 	return result;
 }
 
+// 테스트 코드
 console.log(statement(invoices, plays));
