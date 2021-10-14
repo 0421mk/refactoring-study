@@ -34,10 +34,10 @@ function statement(invoice, plays) {
 	const statementData = {};
 	// 고객 데이터와 공연 데이터를 중간 데이터로 옮김
 	statementData.customer = invoice.customer;
-	
+
 	// {first}.map.({second})) => first 객체에 second 작업(또는 추가)를 거친 Json 객체값을 리턴
 	statementData.performances = invoice.performances.map(enrichPerformance);
-	
+
 	//console.log(statementData.performances);
 	//{
 	//	"playID": "hamlet",
@@ -47,7 +47,7 @@ function statement(invoice, plays) {
 	//		"type": "tragedy"
 	//	}
 	//}
-	
+
 	// 본문 전체를 별도 함수로 추출
 	// 위 데이터로 인해 invoice 인수는 이제 필요가 없다
 	return renderPlainText(statementData, plays);
@@ -58,27 +58,14 @@ function statement(invoice, plays) {
 	function enrichPerformance(aPerformance) {
 		const result = Object.assign({}, aPerformance);
 		result.play = playFor(result);
+		result.amount = amountFor(result);
+		result.volumeCredits = volumeCreditsFor(result);
 		return result;
 	}
 
 	function playFor(aPerformance) {
 		return plays[aPerformance.playID];
 	}
-}
-
-// 중간 데이터 구조 역할 객체를 통해 계산 관련 코드는 statement() 함수로 모으고 
-// renderPlainText()는 data 매개변수로 전달된 데이터만 처리하게 만들 수 있다
-function renderPlainText(data, plays) {
-	let result = `청구 내역 (고객명: ${data.customer})\n`;
-
-	for (let perf of data.performances) {
-		// 청구 내역 출력
-		result += `${perf.play.name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
-	}
-
-	result += `총액: ${usd(totalAmount())}\n`;
-	result += `적립 포인트: ${totalVolumeCredits()}점\n`;
-	return result;
 
 	// 매개변수의 역할이 뚜렷하지 않을 때 부정관사(a/an)을 붙인다.
 	function amountFor(aPerformance) {
@@ -112,6 +99,21 @@ function renderPlainText(data, plays) {
 			result += Math.floor(aPerformance.audience / 5);
 		return result;
 	}
+}
+
+// 중간 데이터 구조 역할 객체를 통해 계산 관련 코드는 statement() 함수로 모으고 
+// renderPlainText()는 data 매개변수로 전달된 데이터만 처리하게 만들 수 있다
+function renderPlainText(data, plays) {
+	let result = `청구 내역 (고객명: ${data.customer})\n`;
+
+	for (let perf of data.performances) {
+		// 청구 내역 출력
+		result += `${perf.play.name}: ${usd(perf.amount)} (${perf.audience}석)\n`;
+	}
+
+	result += `총액: ${usd(totalAmount())}\n`;
+	result += `적립 포인트: ${totalVolumeCredits()}점\n`;
+	return result;
 
 	// format => usd 메서드로 따로 생성하고 단위 변환 로직(/100)도 이동
 	function usd(aNumber) {
@@ -126,7 +128,7 @@ function renderPlainText(data, plays) {
 		// 반복문 쪼개기
 		for (let perf of data.performances) {
 			// 포인트 적립
-			result += volumeCreditsFor(perf);
+			result += perf.volumeCredits;
 		}
 
 		return result;
@@ -137,7 +139,7 @@ function renderPlainText(data, plays) {
 		let result = 0;
 
 		for (let perf of data.performances) {
-			result += amountFor(perf);
+			result += perf.amount;
 		}
 
 		return result;
