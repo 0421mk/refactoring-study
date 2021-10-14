@@ -29,14 +29,14 @@ var invoices = {
 
 // 공연료 청구서를 출력하는 코드
 function statement(invoice, plays) {
-	let totalAmount = 0;
 	let result = `청구 내역 (고객명: ${invoice.customer})\n`;
 
 	for (let perf of invoice.performances) {
 		// 청구 내역 출력
 		result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
-		totalAmount += amountFor(perf);
 	}
+	
+	let totalAmount = appleSauce(invoice);
 
 	result += `총액: ${usd(totalAmount)}\n`;
 	result += `적립 포인트: ${totalVolumeCredits(invoice)}점\n`;
@@ -95,8 +95,18 @@ function totalVolumeCredits(invoice) {
 		// 포인트 적립
 		volumeCredits += volumeCreditsFor(perf);
 	}
-	
+
 	return volumeCredits;
+}
+
+function appleSauce(invoice) {
+	let totalAmount = 0;
+	
+	for (let perf of invoice.performances) {
+		totalAmount += amountFor(perf);
+	}
+	
+	return totalAmount;
 }
 // 테스트 코드
 console.log(statement(invoices, plays));
