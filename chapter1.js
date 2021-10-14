@@ -30,6 +30,13 @@ var invoices = {
 // 공연료 청구서를 출력하는 코드
 function statement(invoice, plays) {
 
+	// 본문 전체를 별도 함수로 추출
+	// 위 데이터로 인해 invoice 인수는 이제 필요가 없다
+	return renderPlainText(createStatementData(invoice, plays));
+
+}
+
+function createStatementData(invoice, plays) {
 	// 중간 데이터 구조 역할을 할 객체 생성
 	const statementData = {};
 	// 고객 데이터와 공연 데이터를 중간 데이터로 옮김
@@ -40,9 +47,7 @@ function statement(invoice, plays) {
 	statementData.totalAmount = totalAmount(statementData);
 	statementData.totalVolumeCredits = totalVolumeCredits(statementData);
 
-	// 본문 전체를 별도 함수로 추출
-	// 위 데이터로 인해 invoice 인수는 이제 필요가 없다
-	return renderPlainText(statementData);
+	return statementData;
 
 	// {} 객체로 aPerformance 값을 겹치치 않는 요소를 살리면서 덮어쓰기
 	// 즉 복사한다는 뜻, result는 복사된 값 출력
@@ -94,13 +99,13 @@ function statement(invoice, plays) {
 
 	function totalVolumeCredits(data) {
 		return data.performances
-		.reduce((total, p) => total + p.volumeCredits, 0);
+			.reduce((total, p) => total + p.volumeCredits, 0);
 	}
 
 	// 함수 결과값 변수는 result로 통일한다.
 	function totalAmount(data) {
 		return data.performances
-		.reduce((total, p) => total + p.amount, 0);
+			.reduce((total, p) => total + p.amount, 0);
 	}
 }
 
