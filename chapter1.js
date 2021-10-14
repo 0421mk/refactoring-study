@@ -37,16 +37,10 @@ function statement(invoice, plays) {
 
 	// {first}.map.({second})) => first 객체에 second 작업(또는 추가)를 거친 Json 객체값을 리턴
 	statementData.performances = invoice.performances.map(enrichPerformance);
-
-	//console.log(statementData.performances);
-	//{
-	//	"playID": "hamlet",
-	//	"audience": 55,
-	//	"play": {
-	//		"name": "Hamlet",
-	//		"type": "tragedy"
-	//	}
-	//}
+	statementData.totalAmount = totalAmount(statementData);
+	statementData.totalVolumeCredits = totalVolumeCredits(statementData);
+	
+	console.log(statementData);
 
 	// 본문 전체를 별도 함수로 추출
 	// 위 데이터로 인해 invoice 인수는 이제 필요가 없다
@@ -99,6 +93,28 @@ function statement(invoice, plays) {
 			result += Math.floor(aPerformance.audience / 5);
 		return result;
 	}
+
+	function totalVolumeCredits(data) {
+		let result = 0;
+		// 반복문 쪼개기
+		for (let perf of data.performances) {
+			// 포인트 적립
+			result += perf.volumeCredits;
+		}
+
+		return result;
+	}
+
+	// 함수 결과값 변수는 result로 통일한다.
+	function totalAmount(data) {
+		let result = 0;
+
+		for (let perf of data.performances) {
+			result += perf.amount;
+		}
+
+		return result;
+	}
 }
 
 // 중간 데이터 구조 역할 객체를 통해 계산 관련 코드는 statement() 함수로 모으고 
@@ -111,8 +127,8 @@ function renderPlainText(data, plays) {
 		result += `${perf.play.name}: ${usd(perf.amount)} (${perf.audience}석)\n`;
 	}
 
-	result += `총액: ${usd(totalAmount())}\n`;
-	result += `적립 포인트: ${totalVolumeCredits()}점\n`;
+	result += `총액: ${usd(data.totalAmount)}\n`;
+	result += `적립 포인트: ${data.totalVolumeCredits}점\n`;
 	return result;
 
 	// format => usd 메서드로 따로 생성하고 단위 변환 로직(/100)도 이동
@@ -123,27 +139,6 @@ function renderPlainText(data, plays) {
 		}).format(aNumber / 100);
 	}
 
-	function totalVolumeCredits() {
-		let result = 0;
-		// 반복문 쪼개기
-		for (let perf of data.performances) {
-			// 포인트 적립
-			result += perf.volumeCredits;
-		}
-
-		return result;
-	}
-
-	// 함수 결과값 변수는 result로 통일한다.
-	function totalAmount() {
-		let result = 0;
-
-		for (let perf of data.performances) {
-			result += perf.amount;
-		}
-
-		return result;
-	}
 }
 
 // 테스트 코드
