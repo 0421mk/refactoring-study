@@ -35,10 +35,8 @@ function statement(invoice, plays) {
 		// 청구 내역 출력
 		result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
 	}
-	
-	let totalAmount = appleSauce(invoice);
 
-	result += `총액: ${usd(totalAmount)}\n`;
+	result += `총액: ${usd(appleSauce(invoice))}\n`;
 	result += `적립 포인트: ${totalVolumeCredits(invoice)}점\n`;
 	return result;
 }
