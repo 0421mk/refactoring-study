@@ -59,7 +59,7 @@ function statement(invoice, plays) {
 function amountFor(aPerformance) {
 	let result = 0;
 
-	switch (play.type) {
+	switch (playFor(aPerformance).type) {
 		case "tragedy":
 			result = 40000;
 			if (aPerformance.audience > 30) {
@@ -89,7 +89,7 @@ function volumeCreditsFor(aPerformance) {
 	// 희극 관객 5명마다 추가 포인트 제공
 	if ("comedy" === playFor(aPerformance).type)
 		volumeCredits += Math.floor(aPerformance.audience / 5);
-	return volueCredits;
+	return volumeCredits;
 }
 // 테스트 코드
 console.log(statement(invoices, plays));
