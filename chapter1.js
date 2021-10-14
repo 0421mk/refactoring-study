@@ -29,6 +29,13 @@ var invoices = {
 
 // 공연료 청구서를 출력하는 코드
 function statement(invoice, plays) {
+
+	// 본문 전체를 별도 함수로 추출
+	return renderPlainText(invoice, plays);
+
+}
+
+function renderPlainText(invoice, plays) {
 	let result = `청구 내역 (고객명: ${invoice.customer})\n`;
 
 	for (let perf of invoice.performances) {
