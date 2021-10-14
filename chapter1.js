@@ -30,7 +30,6 @@ var invoices = {
 // 공연료 청구서를 출력하는 코드
 function statement(invoice, plays) {
 	let totalAmount = 0;
-	let volumeCredits = 0;
 	let result = `청구 내역 (고객명: ${invoice.customer})\n`;
 
 	for (let perf of invoice.performances) {
@@ -38,12 +37,8 @@ function statement(invoice, plays) {
 		result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
 		totalAmount += amountFor(perf);
 	}
-	
-	// 반복문 쪼개기
-	for (let perf of invoice.performances) {
-		// 포인트 적립
-		volumeCredits += volumeCreditsFor(perf);
-	}
+
+	let volumeCredits = totalVolumeCredits(invoice);
 
 	result += `총액: ${usd(totalAmount)}\n`;
 	result += `적립 포인트: ${volumeCredits}점\n`;
@@ -92,7 +87,18 @@ function usd(aNumber) {
 	return new Intl.NumberFormat("en-US", {
 		style: "currency", currency: "USD",
 		minimumFractionDigits: 2
-	}).format(aNumber/100);
+	}).format(aNumber / 100);
+}
+
+function totalVolumeCredits(invoice) {
+	let volumeCredits = 0;
+	// 반복문 쪼개기
+	for (let perf of invoice.performances) {
+		// 포인트 적립
+		volumeCredits += volumeCreditsFor(perf);
+	}
+	
+	return volumeCredits;
 }
 // 테스트 코드
 console.log(statement(invoices, plays));
