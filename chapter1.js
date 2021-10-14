@@ -39,73 +39,74 @@ function statement(invoice, plays) {
 	result += `총액: ${usd(totalAmount(invoice))}\n`;
 	result += `적립 포인트: ${totalVolumeCredits(invoice)}점\n`;
 	return result;
-}
 
-// 매개변수의 역할이 뚜렷하지 않을 때 부정관사(a/an)을 붙인다.
-function amountFor(aPerformance) {
-	let result = 0;
+	// 매개변수의 역할이 뚜렷하지 않을 때 부정관사(a/an)을 붙인다.
+	function amountFor(aPerformance) {
+		let result = 0;
 
-	switch (playFor(aPerformance).type) {
-		case "tragedy":
-			result = 40000;
-			if (aPerformance.audience > 30) {
-				result += 1000 * (aPerformance.audience - 30);
-			}
-			break;
-		case "comedy":
-			result = 30000;
-			if (aPerformance.audience > 20) {
-				result += 10000 + 500 * (aPerformance.audience - 20);
-			}
-			result += 300 * aPerformance.audience;
-			break;
-		default:
-			throw new Error('알 수 없는 장르 : ${play.type}');
-	}
-	return result;
-}
-
-function playFor(aPerformance) {
-	return plays[aPerformance.playID];
-}
-
-function volumeCreditsFor(aPerformance) {
-	let result = 0;
-	result += Math.max(aPerformance.audience - 30, 0);
-	// 희극 관객 5명마다 추가 포인트 제공
-	if ("comedy" === playFor(aPerformance).type)
-		result += Math.floor(aPerformance.audience / 5);
-	return result;
-}
-
-// format => usd 메서드로 따로 생성하고 단위 변환 로직(/100)도 이동
-function usd(aNumber) {
-	return new Intl.NumberFormat("en-US", {
-		style: "currency", currency: "USD",
-		minimumFractionDigits: 2
-	}).format(aNumber / 100);
-}
-
-function totalVolumeCredits(invoice) {
-	let result = 0;
-	// 반복문 쪼개기
-	for (let perf of invoice.performances) {
-		// 포인트 적립
-		result += volumeCreditsFor(perf);
+		switch (playFor(aPerformance).type) {
+			case "tragedy":
+				result = 40000;
+				if (aPerformance.audience > 30) {
+					result += 1000 * (aPerformance.audience - 30);
+				}
+				break;
+			case "comedy":
+				result = 30000;
+				if (aPerformance.audience > 20) {
+					result += 10000 + 500 * (aPerformance.audience - 20);
+				}
+				result += 300 * aPerformance.audience;
+				break;
+			default:
+				throw new Error('알 수 없는 장르 : ${play.type}');
+		}
+		return result;
 	}
 
-	return result;
-}
-
-// 함수 결과값 변수는 result로 통일한다.
-function totalAmount(invoice) {
-	let result = 0;
-
-	for (let perf of invoice.performances) {
-		result += amountFor(perf);
+	function playFor(aPerformance) {
+		return plays[aPerformance.playID];
 	}
 
-	return result;
+	function volumeCreditsFor(aPerformance) {
+		let result = 0;
+		result += Math.max(aPerformance.audience - 30, 0);
+		// 희극 관객 5명마다 추가 포인트 제공
+		if ("comedy" === playFor(aPerformance).type)
+			result += Math.floor(aPerformance.audience / 5);
+		return result;
+	}
+
+	// format => usd 메서드로 따로 생성하고 단위 변환 로직(/100)도 이동
+	function usd(aNumber) {
+		return new Intl.NumberFormat("en-US", {
+			style: "currency", currency: "USD",
+			minimumFractionDigits: 2
+		}).format(aNumber / 100);
+	}
+
+	function totalVolumeCredits() {
+		let result = 0;
+		// 반복문 쪼개기
+		for (let perf of invoice.performances) {
+			// 포인트 적립
+			result += volumeCreditsFor(perf);
+		}
+
+		return result;
+	}
+
+	// 함수 결과값 변수는 result로 통일한다.
+	function totalAmount() {
+		let result = 0;
+
+		for (let perf of invoice.performances) {
+			result += amountFor(perf);
+		}
+
+		return result;
+	}
 }
+
 // 테스트 코드
 console.log(statement(invoices, plays));
