@@ -34,11 +34,36 @@ function statement(invoice, plays) {
 	const statementData = {};
 	// 고객 데이터와 공연 데이터를 중간 데이터로 옮김
 	statementData.customer = invoice.customer;
-	statementData.performances = invoice.performances;
+	
+	// {first}.map.({second})) => first 객체에 second 작업(또는 추가)를 거친 Json 객체값을 리턴
+	statementData.performances = invoice.performances.map(enrichPerformance);
+	
+	//console.log(statementData.performances);
+	//{
+	//	"playID": "hamlet",
+	//	"audience": 55,
+	//	"play": {
+	//		"name": "Hamlet",
+	//		"type": "tragedy"
+	//	}
+	//}
+	
 	// 본문 전체를 별도 함수로 추출
 	// 위 데이터로 인해 invoice 인수는 이제 필요가 없다
 	return renderPlainText(statementData, plays);
 
+	// {} 객체로 aPerformance 값을 겹치치 않는 요소를 살리면서 덮어쓰기
+	// 즉 복사한다는 뜻, result는 복사된 값 출력
+	// 복사를 한 이유는 함수로 건넨 데이터 인수를 수정하기 싫어서이다
+	function enrichPerformance(aPerformance) {
+		const result = Object.assign({}, aPerformance);
+		result.play = playFor(result);
+		return result;
+	}
+
+	function playFor(aPerformance) {
+		return plays[aPerformance.playID];
+	}
 }
 
 // 중간 데이터 구조 역할 객체를 통해 계산 관련 코드는 statement() 함수로 모으고 
@@ -48,7 +73,7 @@ function renderPlainText(data, plays) {
 
 	for (let perf of data.performances) {
 		// 청구 내역 출력
-		result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
+		result += `${perf.play.name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
 	}
 
 	result += `총액: ${usd(totalAmount())}\n`;
@@ -59,7 +84,7 @@ function renderPlainText(data, plays) {
 	function amountFor(aPerformance) {
 		let result = 0;
 
-		switch (playFor(aPerformance).type) {
+		switch (aPerformance.play.type) {
 			case "tragedy":
 				result = 40000;
 				if (aPerformance.audience > 30) {
@@ -79,15 +104,11 @@ function renderPlainText(data, plays) {
 		return result;
 	}
 
-	function playFor(aPerformance) {
-		return plays[aPerformance.playID];
-	}
-
 	function volumeCreditsFor(aPerformance) {
 		let result = 0;
 		result += Math.max(aPerformance.audience - 30, 0);
 		// 희극 관객 5명마다 추가 포인트 제공
-		if ("comedy" === playFor(aPerformance).type)
+		if ("comedy" === aPerformance.play.type)
 			result += Math.floor(aPerformance.audience / 5);
 		return result;
 	}
