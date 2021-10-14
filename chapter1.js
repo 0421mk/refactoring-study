@@ -33,24 +33,16 @@ function statement(invoice, plays) {
 	let volumeCredits = 0;
 	let result = `청구 내역 (고객명: ${invoice.customer})\n`;
 
-	// 블록 범위의 변수 선언
-	// const는 블록 범위의 상수(재할당 불가) 선언
-	// 언어에 맞는 통화(currency) 서식 지원, 소수부의 자릿수는 2
-	const format = new Intl.NumberFormat("en-US", {
-		style: "currency", currency: "USD",
-		minimumFractionDigits: 2
-	}).format;
-
 	for (let perf of invoice.performances) {
 		// 포인트 적립
 		volumeCredits += volumeCreditsFor(perf);
 
 		// 청구 내역 출력
-		result += `${playFor(perf).name}: ${format(amountFor(perf) / 100)} (${perf.audience}석)\n`;
+		result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
 		totalAmount += amountFor(perf);
 	}
 
-	result += `총액: ${format(totalAmount / 100)}\n`;
+	result += `총액: ${usd(totalAmount)}\n`;
 	result += `적립 포인트: ${volumeCredits}점\n`;
 	return result;
 }
@@ -90,6 +82,14 @@ function volumeCreditsFor(aPerformance) {
 	if ("comedy" === playFor(aPerformance).type)
 		volumeCredits += Math.floor(aPerformance.audience / 5);
 	return volumeCredits;
+}
+
+// format => usd 메서드로 따로 생성하고 단위 변환 로직(/100)도 이동
+function usd(aNumber) {
+	return new Intl.NumberFormat("en-US", {
+		style: "currency", currency: "USD",
+		minimumFractionDigits: 2
+	}).format(aNumber/100);
 }
 // 테스트 코드
 console.log(statement(invoices, plays));
