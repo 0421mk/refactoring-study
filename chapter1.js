@@ -70,12 +70,12 @@ function playFor(aPerformance) {
 }
 
 function volumeCreditsFor(aPerformance) {
-	let volumeCredits = 0;
-	volumeCredits += Math.max(aPerformance.audience - 30, 0);
+	let result = 0;
+	result += Math.max(aPerformance.audience - 30, 0);
 	// 희극 관객 5명마다 추가 포인트 제공
 	if ("comedy" === playFor(aPerformance).type)
-		volumeCredits += Math.floor(aPerformance.audience / 5);
-	return volumeCredits;
+		result += Math.floor(aPerformance.audience / 5);
+	return result;
 }
 
 // format => usd 메서드로 따로 생성하고 단위 변환 로직(/100)도 이동
@@ -87,24 +87,25 @@ function usd(aNumber) {
 }
 
 function totalVolumeCredits(invoice) {
-	let volumeCredits = 0;
+	let result = 0;
 	// 반복문 쪼개기
 	for (let perf of invoice.performances) {
 		// 포인트 적립
-		volumeCredits += volumeCreditsFor(perf);
+		result += volumeCreditsFor(perf);
 	}
 
-	return volumeCredits;
+	return result;
 }
 
+// 함수 결과값 변수는 result로 통일한다.
 function totalAmount(invoice) {
-	let totalAmount = 0;
+	let result = 0;
 
 	for (let perf of invoice.performances) {
-		totalAmount += amountFor(perf);
+		result += amountFor(perf);
 	}
 
-	return totalAmount;
+	return result;
 }
 // 테스트 코드
 console.log(statement(invoices, plays));
