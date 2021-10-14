@@ -1,4 +1,5 @@
 // 1. 먼저 전체 동작을 각각 부분으로 나눌 수 있는 지점을 찾는다. => switch문
+// 2. amountFor 함수를 만들고 내부 변수의 이름을 명확하게 변경한다.
 
 // json 데이터
 var plays = {
@@ -62,27 +63,29 @@ function statement(invoice, plays) {
 	return result;
 }
 
-function amountFor(perf, play) {
-	let thisAmount = 0;
-	
+// 매개변수의 역할이 뚜렷하지 않을 때 부정관사(a/an)을 붙인다.
+function amountFor(aPerformance, play) {
+	let result = 0;
+
 	switch (play.type) {
 		case "tragedy":
-			thisAmount = 40000;
-			if (perf.audience > 30) {
-				thisAmount += 1000 * (perf.audience - 30);
+			result = 40000;
+			if (aPerformance.audience > 30) {
+				result += 1000 * (aPerformance.audience - 30);
 			}
 			break;
 		case "comedy":
-			thisAmount = 30000;
-			if (perf.audience > 20) {
-				thisAmount += 10000 + 500 * (perf.audience - 20);
+			result = 30000;
+			if (aPerformance.audience > 20) {
+				result += 10000 + 500 * (aPerformance.audience - 20);
 			}
-			thisAmount += 300 * perf.audience;
+			result += 300 * aPerformance.audience;
 			break;
 		default:
 			throw new Error('알 수 없는 장르 : ${play.type}');
 	}
-	return thisAmount;
+	return result;
 }
+
 // 테스트 코드
 console.log(statement(invoices, plays));
