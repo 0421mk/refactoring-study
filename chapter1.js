@@ -1,8 +1,10 @@
+// 1. 먼저 전체 동작을 각각 부분으로 나눌 수 있는 지점을 찾는다. => switch문
+
 // json 데이터
 var plays = {
-	"hamlet": {"name": "Hamlet", "type": "tragedy"},
-	"as-Like": {"name": "As You Like It", "type": "comedy"},
-	"othello": {"name": "Othello", "type": "tragedy"}
+	"hamlet": { "name": "Hamlet", "type": "tragedy" },
+	"as-Like": { "name": "As You Like It", "type": "comedy" },
+	"othello": { "name": "Othello", "type": "tragedy" }
 };
 // json 데이터
 var invoices = {
@@ -43,40 +45,42 @@ function statement(invoice, plays) {
 
 	for (let perf of invoice.performances) {
 		const play = plays[perf.playID];
-		let thisAmount = 0;
+		let thisAmount = amountFor(perf, play);
 
-		switch (play.type) {
-			case "tragedy":
-				thisAmount = 40000;
-				if (perf.audience > 30) {
-					thisAmount += 1000 * (perf.audience - 30);
-				}
-				break;
-			case "comedy":
-				thisAmount = 30000;
-				if (perf.audience > 20) {
-					thisAmount += 10000 + 500 * (perf.audience - 20);
-				}
-				thisAmount += 300 * perf.audience;
-				break;
-			default:
-				throw new Error('알 수 없는 장르 : ${play.type}');
-		}
-		
 		// 포인트 적립
 		volumeCredits += Math.max(perf.audience - 30, 0);
 		// 희극 관객 5명마다 추가 포인트 제공
 		if ("comedy" === play.type) volumeCredits += Math.floor(perf.audience / 5);
-		
+
 		// 청구 내역 출력
-		result += `${play.name}: ${format(thisAmount/100)} (${perf.audience}석)\n`;
+		result += `${play.name}: ${format(thisAmount / 100)} (${perf.audience}석)\n`;
 		totalAmount += thisAmount;
 	}
-	
-	result += `총액: ${format(totalAmount/100)}\n`;
+
+	result += `총액: ${format(totalAmount / 100)}\n`;
 	result += `적립 포인트: ${volumeCredits}점\n`;
 	return result;
 }
 
+function amountFor(perf, play) {
+	switch (play.type) {
+		case "tragedy":
+			thisAmount = 40000;
+			if (perf.audience > 30) {
+				thisAmount += 1000 * (perf.audience - 30);
+			}
+			break;
+		case "comedy":
+			thisAmount = 30000;
+			if (perf.audience > 20) {
+				thisAmount += 10000 + 500 * (perf.audience - 20);
+			}
+			thisAmount += 300 * perf.audience;
+			break;
+		default:
+			throw new Error('알 수 없는 장르 : ${play.type}');
+	}
+	return thisAmount;
+}
 // 테스트 코드
 console.log(statement(invoices, plays));
