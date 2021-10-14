@@ -99,11 +99,11 @@ function totalVolumeCredits(invoice) {
 
 function totalAmount(invoice) {
 	let totalAmount = 0;
-	
+
 	for (let perf of invoice.performances) {
 		totalAmount += amountFor(perf);
 	}
-	
+
 	return totalAmount;
 }
 // 테스트 코드
