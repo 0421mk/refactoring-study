@@ -39,12 +39,10 @@ function statement(invoice, plays) {
 	statementData.performances = invoice.performances.map(enrichPerformance);
 	statementData.totalAmount = totalAmount(statementData);
 	statementData.totalVolumeCredits = totalVolumeCredits(statementData);
-	
-	console.log(statementData);
 
 	// 본문 전체를 별도 함수로 추출
 	// 위 데이터로 인해 invoice 인수는 이제 필요가 없다
-	return renderPlainText(statementData, plays);
+	return renderPlainText(statementData);
 
 	// {} 객체로 aPerformance 값을 겹치치 않는 요소를 살리면서 덮어쓰기
 	// 즉 복사한다는 뜻, result는 복사된 값 출력
@@ -95,31 +93,20 @@ function statement(invoice, plays) {
 	}
 
 	function totalVolumeCredits(data) {
-		let result = 0;
-		// 반복문 쪼개기
-		for (let perf of data.performances) {
-			// 포인트 적립
-			result += perf.volumeCredits;
-		}
-
-		return result;
+		return data.performances
+		.reduce((total, p) => total + p.volumeCredits, 0);
 	}
 
 	// 함수 결과값 변수는 result로 통일한다.
 	function totalAmount(data) {
-		let result = 0;
-
-		for (let perf of data.performances) {
-			result += perf.amount;
-		}
-
-		return result;
+		return data.performances
+		.reduce((total, p) => total + p.amount, 0);
 	}
 }
 
 // 중간 데이터 구조 역할 객체를 통해 계산 관련 코드는 statement() 함수로 모으고 
 // renderPlainText()는 data 매개변수로 전달된 데이터만 처리하게 만들 수 있다
-function renderPlainText(data, plays) {
+function renderPlainText(data) {
 	let result = `청구 내역 (고객명: ${data.customer})\n`;
 
 	for (let perf of data.performances) {
