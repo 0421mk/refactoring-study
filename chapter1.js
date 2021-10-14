@@ -1,5 +1,6 @@
 // 1. 먼저 전체 동작을 각각 부분으로 나눌 수 있는 지점을 찾는다. => switch문
 // 2. amountFor 함수를 만들고 내부 변수의 이름을 명확하게 변경한다.
+// 3. play는 amountFor 안에 aPerformance에서 얻기 때문에 매개변수로 전달할 필요가 없다.
 
 // json 데이터
 var plays = {
@@ -45,7 +46,10 @@ function statement(invoice, plays) {
 	}).format;
 
 	for (let perf of invoice.performances) {
-		const play = plays[perf.playID];
+		// 우변을 함수로 추출
+		// 그 다음, 변수 인라인
+		// let thisAmount = amountFor(perf, playFor(perf));
+		const play = playFor(perf);
 		let thisAmount = amountFor(perf, play);
 
 		// 포인트 적립
@@ -87,5 +91,8 @@ function amountFor(aPerformance, play) {
 	return result;
 }
 
+function playFor(aPerformance) {
+	return plays[aPerformance.playID];
+}
 // 테스트 코드
 console.log(statement(invoices, plays));
