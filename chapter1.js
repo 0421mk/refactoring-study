@@ -1,7 +1,3 @@
-// 1. 먼저 전체 동작을 각각 부분으로 나눌 수 있는 지점을 찾는다. => switch문
-// 2. amountFor 함수를 만들고 내부 변수의 이름을 명확하게 변경한다.
-// 3. play는 amountFor 안에 aPerformance에서 얻기 때문에 매개변수로 전달할 필요가 없다.
-
 // json 데이터
 var plays = {
 	"hamlet": { "name": "Hamlet", "type": "tragedy" },
@@ -46,20 +42,14 @@ function statement(invoice, plays) {
 	}).format;
 
 	for (let perf of invoice.performances) {
-		// 우변을 함수로 추출
-		// 그 다음, 변수 인라인
-		// let thisAmount = amountFor(perf, playFor(perf));
-		const play = playFor(perf);
-		let thisAmount = amountFor(perf, play);
-
 		// 포인트 적립
 		volumeCredits += Math.max(perf.audience - 30, 0);
 		// 희극 관객 5명마다 추가 포인트 제공
-		if ("comedy" === play.type) volumeCredits += Math.floor(perf.audience / 5);
+		if ("comedy" === playFor(perf).type) volumeCredits += Math.floor(perf.audience / 5);
 
 		// 청구 내역 출력
-		result += `${play.name}: ${format(thisAmount / 100)} (${perf.audience}석)\n`;
-		totalAmount += thisAmount;
+		result += `${playFor(perf).name}: ${format(amountFor(perf) / 100)} (${perf.audience}석)\n`;
+		totalAmount += amountFor(perf);
 	}
 
 	result += `총액: ${format(totalAmount / 100)}\n`;
@@ -68,7 +58,7 @@ function statement(invoice, plays) {
 }
 
 // 매개변수의 역할이 뚜렷하지 않을 때 부정관사(a/an)을 붙인다.
-function amountFor(aPerformance, play) {
+function amountFor(aPerformance) {
 	let result = 0;
 
 	switch (play.type) {
