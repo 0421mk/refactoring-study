@@ -30,21 +30,29 @@ var invoices = {
 // 공연료 청구서를 출력하는 코드
 function statement(invoice, plays) {
 
+	// 중간 데이터 구조 역할을 할 객체 생성
+	const statementData = {};
+	// 고객 데이터와 공연 데이터를 중간 데이터로 옮김
+	statementData.customer = invoice.customer;
+	statementData.performances = invoice.performances;
 	// 본문 전체를 별도 함수로 추출
-	return renderPlainText(invoice, plays);
+	// 위 데이터로 인해 invoice 인수는 이제 필요가 없다
+	return renderPlainText(statementData, plays);
 
 }
 
-function renderPlainText(invoice, plays) {
-	let result = `청구 내역 (고객명: ${invoice.customer})\n`;
+// 중간 데이터 구조 역할 객체를 통해 계산 관련 코드는 statement() 함수로 모으고 
+// renderPlainText()는 data 매개변수로 전달된 데이터만 처리하게 만들 수 있다
+function renderPlainText(data, plays) {
+	let result = `청구 내역 (고객명: ${data.customer})\n`;
 
-	for (let perf of invoice.performances) {
+	for (let perf of data.performances) {
 		// 청구 내역 출력
 		result += `${playFor(perf).name}: ${usd(amountFor(perf))} (${perf.audience}석)\n`;
 	}
 
-	result += `총액: ${usd(totalAmount(invoice))}\n`;
-	result += `적립 포인트: ${totalVolumeCredits(invoice)}점\n`;
+	result += `총액: ${usd(totalAmount())}\n`;
+	result += `적립 포인트: ${totalVolumeCredits()}점\n`;
 	return result;
 
 	// 매개변수의 역할이 뚜렷하지 않을 때 부정관사(a/an)을 붙인다.
@@ -95,7 +103,7 @@ function renderPlainText(invoice, plays) {
 	function totalVolumeCredits() {
 		let result = 0;
 		// 반복문 쪼개기
-		for (let perf of invoice.performances) {
+		for (let perf of data.performances) {
 			// 포인트 적립
 			result += volumeCreditsFor(perf);
 		}
@@ -107,7 +115,7 @@ function renderPlainText(invoice, plays) {
 	function totalAmount() {
 		let result = 0;
 
-		for (let perf of invoice.performances) {
+		for (let perf of data.performances) {
 			result += amountFor(perf);
 		}
 
